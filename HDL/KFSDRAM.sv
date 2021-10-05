@@ -408,7 +408,7 @@ module KFSDRAM #(
     //
     assign  idle            = (state == IDLE);
     assign  write_flag      = (state == WRITE);
-    assign  read_flag_tmp   = (next_state == READ)  && (state_counter > cas_latency);
+    assign  read_flag_tmp   = (state == READ) && (next_state == READ)  && (state_counter > cas_latency);
 
     always_ff @(posedge sdram_clock, posedge sdram_reset) begin
         if (sdram_reset)
