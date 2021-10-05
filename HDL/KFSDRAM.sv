@@ -315,7 +315,7 @@ module KFSDRAM #(
                     sdram_we        <= 1'b1;
                     sdram_ba        <= (send_cmd_timing) ? address[`BANK_ADDRESS_TOP:`BANK_ADDRESS_BOTTOM] : 0;
                     sdram_dq_out    <= 0;
-                    sdram_dq_io     <= (send_cmd_timing) ? 1'b0 : 1'b1;
+                    sdram_dq_io     <= 1'b1;
                 end
                 WRITE: begin
                     sdram_address[sdram_col_width-1:0]  <= address[sdram_col_width-1:0] + access_counter;
@@ -349,7 +349,7 @@ module KFSDRAM #(
                     sdram_we        <= 1'b1;
                     sdram_ba        <= (send_cmd_timing) ? address[`BANK_ADDRESS_TOP:`BANK_ADDRESS_BOTTOM] : 0;
                     sdram_dq_out    <= 0;
-                    sdram_dq_io     <= (send_cmd_timing) ? 1'b0 : 1'b1;
+                    sdram_dq_io     <= 1'b1;
                 end
                 READ: begin
                     sdram_address[sdram_col_width-1:0]  <= (~end_read_cmd) ? address[sdram_col_width-1:0] + access_counter : 0;
@@ -359,8 +359,8 @@ module KFSDRAM #(
                     sdram_ras       <= 1'b1;
                     sdram_cas       <= (~end_read_cmd) ? 1'b0 : 1'b1;
                     sdram_we        <= 1'b1;
-                    sdram_ba        <= address[`BANK_ADDRESS_TOP:`BANK_ADDRESS_BOTTOM];
-                    sdram_dq_out    <= data_in;
+                    sdram_ba        <= (~end_read_cmd) ? address[`BANK_ADDRESS_TOP:`BANK_ADDRESS_BOTTOM] : 0;
+                    sdram_dq_out    <= 0;
                     sdram_dq_io     <= 1'b1;
                 end
                 PRECHARGE: begin
