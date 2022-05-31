@@ -18,8 +18,7 @@ module KFSDRAM #(
     parameter sdram_trcd            = 16'd6-16'd1,
     parameter sdram_tdpl            = 16'd2-16'd1,
     parameter cas_latency           = 3'b011,
-    parameter sdram_init_wait       = 16'd10000,
-    parameter sdram_refresh_cycle   = 16'd00750
+    parameter sdram_init_wait       = 16'd10000
 ) (
     input   logic                               sdram_clock,
     input   logic                               sdram_reset,
@@ -60,7 +59,6 @@ module KFSDRAM #(
     state_t                             state;
     state_t                             next_state;
     logic   [15:0]                      state_counter;
-    logic   [15:0]                      refresh_counter;
     logic   [sdram_col_width-1:0]       access_counter;
     logic   [sdram_col_width-1:0]       read_counter;
     logic                               send_cmd_timing;
@@ -103,7 +101,7 @@ module KFSDRAM #(
                     next_state = WRITE_ACT;
                 else if (read_request)
                     next_state = READ_ACT;
-                else if ((~sdram_no_refresh) && (refresh_counter == sdram_refresh_cycle))
+                else if (~sdram_no_refresh)
                     next_state = REFRESH;
             end
             WRITE_ACT: begin
@@ -154,21 +152,6 @@ module KFSDRAM #(
             state_counter   <= 0;
         else
             state_counter   <= state_counter + 16'h01;
-    end
-
-
-    //
-    // Reflesh Counter
-    //
-    always_ff @(posedge sdram_clock, posedge sdram_reset) begin
-        if (sdram_reset)
-            refresh_counter <= 0;
-        else if ((~sdram_cs) && (~sdram_ras) & (~sdram_cas) & (sdram_we))
-            refresh_counter <= 0;
-        else if (refresh_counter != sdram_refresh_cycle)
-            refresh_counter <= refresh_counter + 16'h01;
-        else
-            refresh_counter <= refresh_counter;
     end
 
 
